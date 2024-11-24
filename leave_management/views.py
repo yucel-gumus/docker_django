@@ -15,8 +15,8 @@ from datetime import  timedelta
 from django.db.models import Sum
 from leave_management.tasks import deduct_leave_for_lateness
 from accounts.tasks import notify_manager_for_lateness
-
-
+from accounts.tasks import create_notification_for_manager
+from django.contrib import messages
 
 
 @login_required
@@ -145,27 +145,63 @@ def manager_leave_request_list(request):
 @login_required
 @manager_required
 def leave_create_for_employee(request):
-    if request.method == "POST":
-        form = LeaveRequestForm(request.POST)
-        if form.is_valid():
-            leave_request = form.save(commit=False)
-            username = request.POST.get("username")
-            try:
-                user = User.objects.get(username=username)
-                leave_request.user = user
-                leave_request.status = "approved"
-                leave_request.save()
-                return redirect("manager_leave_request_list")
-            except User.DoesNotExist:
-                messages.error(request, "Kullanıcı bulunamadı.")
-    else:
-        form = LeaveRequestForm()
-    users = User.objects.filter(profile__role="employee")
-    return render(
-        request,
-        "leave_management/leave_create_for_employee.html",
-        {"form": form, "users": users},
-    )
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+        
+        # Veriler eksikse, hata mesajı göster
+        if not start_date_str or not end_date_str:
+            messages.error(request, "Başlangıç ve Bitiş tarihleri boş olamaz.")
+            return redirect('leave_create_for_employee')  # Aynı sayfaya geri yönlendir
+
+        # Tarihleri dönüştürme
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+
+        # İzin süresi hesapla
+        total_days = (end_date - start_date).days + 1
+
+        # Personel seçme
+        user = User.objects.get(username=username)
+
+        # Yıllık izin gününü düşür
+        profile = user.profile
+        new_annual_leave_days = profile.annual_leave_days - total_days
+
+        # Eğer yıllık izin günleri negatif oluyorsa, 0 yap
+        if new_annual_leave_days < 0:
+            new_annual_leave_days = 0
+
+        # İzin oluştur
+        leave_request = LeaveRequest.objects.create(
+            user=user,
+            start_date=start_date,
+            end_date=end_date,
+            reason=request.POST.get('reason'),
+            status="approved"
+        )
+
+        # Yıllık izin gününü güncelle
+        profile.annual_leave_days = new_annual_leave_days
+        profile.save()
+
+        # Eğer izin süresi 3 günden azsa bildirim gönder
+        if profile.annual_leave_days < 3:
+                managers = User.objects.filter(profile__role="manager")
+                for manager in managers:
+                    Notification.objects.create(
+                        user=manager,
+                        message=f"{leave_request.user.username} adlı personelin yıllık izni {profile.annual_leave_days} güne düştü.",
+                    )
+
+        # Başarı mesajı ve yönlendirme
+        messages.success(request, f"{user.username} için {total_days} gün izin tanımlandı.")
+        
+        # Yönlendirme yapılacak doğru URL'yi belirtin
+        return redirect('manager_leave_request_list')  # Örnek: Burada 'employee_dashboard' URL'yi kullanabilirsiniz.
+
+    return render(request, 'leave_management/leave_create_for_employee.html', {'users': User.objects.all()})
 
 
 @login_required
