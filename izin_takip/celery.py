@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
-from django.conf import settings  # Ayarları içe aktarın
+from django.conf import settings  # Django ayarlarını içe aktarın
 
 # Django'nun ayarlarını Celery'e yükle
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'izin_takip.settings')  # Proje adınızı kullanın

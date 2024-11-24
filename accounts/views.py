@@ -10,6 +10,7 @@ from accounts.models import Notification
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
+
 def employee_login(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -75,14 +76,14 @@ def employee_list(request):
     return render(request, "accounts/employee_list.html", {"employees": employees})
 
 
-
-
 @login_required
 @manager_required
 def mark_notification_as_read(request, pk):
-    if request.method == 'POST':
+    if request.method == "POST":
         notification = get_object_or_404(Notification, pk=pk, user=request.user)
         notification.is_read = True
         notification.save()
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'fail', 'message': 'Invalid request method'}, status=400)
+        return JsonResponse({"status": "success"})
+    return JsonResponse(
+        {"status": "fail", "message": "Invalid request method"}, status=400
+    )

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'accounts',
     'leave_management',
     'drf_yasg',
-    'crispy_forms',
+    'crispy_forms',    
 
 ]
 

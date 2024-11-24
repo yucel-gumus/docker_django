@@ -6,6 +6,7 @@ from .api_views import (
     employee_leave_requests
 )
 from rest_framework import routers
+from leave_management.views import monthly_work_summary  # Burada view fonksiyonunu içe aktarıyoruz
 
 router = routers.DefaultRouter()
 router.register(r'api/leave-requests', LeaveRequestViewSet)
@@ -20,4 +21,9 @@ urlpatterns = [
     path('api/my-leave-requests/', employee_leave_requests, name='employee_leave_requests'),
     path('api/leave-request-data/', LeaveRequestDataView.as_view(), name='leave_request_data'),
     path('', include(router.urls)),
+    path('attendance/entry/', views.record_entry, name='record_entry'),
+    path('attendance/monthly-summary/', monthly_work_summary, name='monthly_work_summary'),
+
+
+
 ]

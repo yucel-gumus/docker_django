@@ -9,6 +9,14 @@ from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from accounts.models import Notification
+from datetime import datetime
+from .models import Attendance
+from datetime import  timedelta
+from django.db.models import Sum
+from leave_management.tasks import deduct_leave_for_lateness
+from accounts.tasks import notify_manager_for_lateness
+
+
 
 
 @login_required
@@ -158,3 +166,73 @@ def leave_create_for_employee(request):
         "leave_management/leave_create_for_employee.html",
         {"form": form, "users": users},
     )
+
+
+@login_required
+@employee_required
+def record_entry(request):
+    if request.method == 'POST':
+        today = datetime.now().date()
+        now = datetime.now().time()
+
+        # Günlük giriş kaydı
+        attendance, created = Attendance.objects.get_or_create(user=request.user, date=today)
+        if created:
+            attendance.entry_time = now
+            attendance.calculate_late_minutes()
+            attendance.save()
+
+            # Geç kalma bildirimi oluştur
+            if attendance.late_minutes > 0:
+                notify_manager_for_lateness.delay(
+                    user_id=request.user.id,
+                    late_minutes=attendance.late_minutes
+                )
+                deduct_leave_for_lateness.delay(
+                    user_id=request.user.id,
+                    late_minutes=attendance.late_minutes
+                )
+
+            return JsonResponse({'status': 'success', 'message': 'Giriş kaydedildi.'})
+        else:
+            return JsonResponse({'status': 'fail', 'message': 'Bugün için zaten giriş kaydı var.'})
+
+
+@login_required
+@employee_required
+def record_exit(request):
+    if request.method == 'POST':
+        today = datetime.now().date()
+        now = datetime.now().time()
+
+        # Günlük çıkış kaydı
+        attendance = Attendance.objects.filter(user=request.user, date=today).first()
+        if attendance:
+            attendance.exit_time = now
+            attendance.calculate_working_hours()
+            attendance.save()
+            return JsonResponse({'status': 'success', 'message': 'Çıkış kaydedildi.'})
+        else:
+            return JsonResponse({'status': 'fail', 'message': 'Bugün için giriş kaydı bulunamadı.'})
+
+
+
+
+@login_required
+@manager_required
+def monthly_work_summary(request):
+    # Geçerli ay ve yılı alın
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+
+    # Kullanıcı bazında çalışma saatlerini topla
+    attendance_data = Attendance.objects.filter(
+        date__year=current_year,
+        date__month=current_month
+    ).values('user__username').annotate(total_working_hours=Sum('working_hours'))
+
+    return render(request, 'leave_management/monthly_summary.html', {
+        'attendance_data': attendance_data,
+        'month': current_month,
+        'year': current_year,
+    })
