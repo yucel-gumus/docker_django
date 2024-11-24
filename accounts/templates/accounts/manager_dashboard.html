@@ -16,6 +16,9 @@
         <div class="card-header bg-primary text-white">
             <h4>Bildirimler</h4>
         </div>
+        <div id="notifications-container">
+            <!-- Gelen bildirimler burada listelenecek -->
+        </div>
         <div class="card-body">
             {% if notifications %}
             <ul class="list-group">
@@ -93,5 +96,34 @@
                 }
             });
     }
+</script>
+<script>
+    // WebSocket bağlantısını başlat
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const socket = new WebSocket(protocol + window.location.host + '/ws/attendance/');
+
+    socket.onopen = function (event) {
+        console.log("WebSocket bağlantısı başarılı.");
+    };
+
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        const message = data.message;
+
+        // Yeni bildirimleri ekrana ekle
+        const notificationContainer = document.getElementById("notifications-container");
+        const newNotification = document.createElement("div");
+        newNotification.classList.add("alert", "alert-info", "mt-2");
+        newNotification.textContent = message;
+        notificationContainer.appendChild(newNotification);
+    };
+
+    socket.onclose = function (event) {
+        console.log("WebSocket bağlantısı kapandı.");
+    };
+
+    socket.onerror = function (error) {
+        console.log("WebSocket hatası: ", error);
+    };
 </script>
 {% endblock %}

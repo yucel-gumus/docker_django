@@ -14,7 +14,7 @@ class Command(BaseCommand):
             return
 
         # Giriş ve çıkış saatleri
-        entry_time = time(12, 0)  # Geç giriş
+        entry_time = time(10, 0)  # Geç giriş
         exit_time = time(17, 0)
 
         # Attendance kaydı oluştur

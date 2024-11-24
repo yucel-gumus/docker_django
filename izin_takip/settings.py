@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'accounts',
     'leave_management',
     'drf_yasg',
-    'crispy_forms',    
+    'crispy_forms',
+    'channels',   
 
 ]
+ASGI_APPLICATION = 'izin_takip.asgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,6 +93,14 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Redis ayarları
+        },
+    },
+}
 
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
