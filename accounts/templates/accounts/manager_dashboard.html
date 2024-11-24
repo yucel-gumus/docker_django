@@ -12,6 +12,27 @@
             <hr class="my-4">
         </div>
     </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Bildirimler</h4>
+        </div>
+        <div class="card-body">
+            {% if notifications %}
+            <ul class="list-group">
+                {% for notification in notifications %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ notification.message }}
+                    <button class="btn btn-sm btn-success" onclick="markAsRead('{{ notification.id }}')">
+                        Okundu
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted">Henüz bir bildirim yok.</p>
+            {% endif %}
+        </div>
+    </div>
     <div class="row">
         <!-- Personel Listesi Kartı -->
         <div class="col-md-4 mb-4">
@@ -35,7 +56,8 @@
                     <p class="card-text">İzin taleplerini yönetmek için buraya tıklayın.</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{% url 'manager_leave_request_list' %}" class="btn btn-primary btn-block">İzin Talepleri</a>
+                    <a href="{% url 'manager_leave_request_list' %}" class="btn btn-primary btn-block">İzin
+                        Talepleri</a>
                 </div>
             </div>
         </div>
@@ -54,4 +76,22 @@
         </div>
     </div>
 </div>
+<script>
+    function markAsRead(notificationId) {
+        console.log(notificationId)
+        fetch(`/accounts/notifications/read/${notificationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Yanıtı konsola yazdır
+                if (data.status === 'success') {
+                    location.reload();
+                }
+            });
+    }
+</script>
 {% endblock %}

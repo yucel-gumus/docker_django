@@ -11,5 +11,6 @@ urlpatterns = [
     path('manager/dashboard/', views.manager_dashboard, name='manager_dashboard'),
     path('api/employee_data/', EmployeeDataView.as_view(), name='employee_data'),
     path('manager/employee-list/', views.employee_list, name='employee_list'),
+    path('notifications/read/<int:pk>/', views.mark_notification_as_read, name='mark_notification_as_read'),
 
 ]
