@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}İzin Takip Sistemi{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    crossorigin="anonymous">
+
+    <!-- Font Awesome CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        crossorigin="anonymous"
+    >
+    {% block extra_css %}{% endblock %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand i {
+            margin-right: 8px;
+        }
+        .footer {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .footer a {
+            color: #ffc107;
+        }
+        .content-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Barı -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <i class="fas fa-calendar-alt"></i> İzin Takip Sistemi
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Menü">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            {% if user.is_authenticated %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" 
+                           aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user"></i> {{ user.username }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                            {% if user.profile.role == 'employee' %}
+                                <a class="dropdown-item" href="{% url 'employee_dashboard' %}">
+                                    <i class="fas fa-tachometer-alt"></i> Panelim
+                                </a>
+                                <a class="dropdown-item" href="{% url 'leave_request_create' %}">
+                                    <i class="fas fa-paper-plane"></i> İzin Talep Et
+                                </a>
+                                <a class="dropdown-item" href="{% url 'leave_request_list' %}">
+                                    <i class="fas fa-list"></i> İzin Taleplerim
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{% url 'employee_logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                                </a>
+                            {% elif user.profile.role == 'manager' %}
+                                <a class="dropdown-item" href="{% url 'manager_dashboard' %}">
+                                    <i class="fas fa-tachometer-alt"></i> Panelim
+                                </a>
+                                <a class="dropdown-item" href="{% url 'employee_list' %}">
+                                    <i class="fas fa-users"></i> Personel Listesi
+                                </a>
+                                <a class="dropdown-item" href="{% url 'manager_leave_request_list' %}">
+                                    <i class="fas fa-tasks"></i> İzin Talepleri
+                                </a>
+                                <a class="dropdown-item" href="{% url 'leave_create_for_employee' %}">
+                                    <i class="fas fa-plus-circle"></i> İzin Tanımla
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{% url 'manager_logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                                </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+            {% else %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'employee_login' %}">
+                            <i class="fas fa-user"></i> Personel Giriş
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'manager_login' %}">
+                            <i class="fas fa-user-tie"></i> Yetkili Giriş
+                        </a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- İçerik -->
+    <div class="container mt-4">
+        <div class="content-container">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center py-3 mt-4">
+        <div class="container">
+            <small>&copy; {{ current_year }} <a href="{% url 'index' %}">İzin Takip Sistemi</a>. Tüm hakları saklıdır.</small>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            crossorigin="anonymous"></script>
+    <script
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"
+    ></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

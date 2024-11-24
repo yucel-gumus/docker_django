@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Yetkili Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Hoş Geldiniz Mesajı -->
+        <div class="col-12 text-center mb-4">
+            <h1 class="display-4">Hoş geldiniz, {{ request.user.username }}</h1>
+            <p class="lead">Bu sizin yetkili paneliniz.</p>
+            <hr class="my-4">
+        </div>
+    </div>
+    <div class="row">
+        <!-- Personel Listesi Kartı -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title">Personel Listesi</h5>
+                    <p class="card-text">Tüm personeli görüntülemek için buraya tıklayın.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'employee_list' %}" class="btn btn-success btn-block">Personel Listesi</a>
+                </div>
+            </div>
+        </div>
+        <!-- İzin Taleplerini Yönet Kartı -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-tasks fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">İzin Talepleri</h5>
+                    <p class="card-text">İzin taleplerini yönetmek için buraya tıklayın.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'manager_leave_request_list' %}" class="btn btn-primary btn-block">İzin Talepleri</a>
+                </div>
+            </div>
+        </div>
+        <!-- İzin Tanımla Kartı -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-plus-circle fa-3x mb-3 text-warning"></i>
+                    <h5 class="card-title">İzin Tanımla</h5>
+                    <p class="card-text">Personel için izin tanımlamak için buraya tıklayın.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'leave_create_for_employee' %}" class="btn btn-warning btn-block">İzin Tanımla</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

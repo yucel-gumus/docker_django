@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}İzin Takip Sistemi{% endblock %}
+
+{% block content %}
+<div class="jumbotron jumbotron-fluid text-center bg-light">
+    <div class="container">
+        <h1 class="display-4"><i class="fas fa-calendar-check"></i> İzin Takip Sistemi</h1>
+        <p class="lead">Lütfen giriş yapmak istediğiniz seçeneği seçin.</p>
+        <hr class="my-4">
+        <div class="mt-4 d-flex justify-content-center">
+            <a class="btn btn-primary btn-lg mr-3" href="{% url 'employee_login' %}" role="button">
+                <i class="fas fa-user"></i> Personel Girişi
+            </a>
+            <a class="btn btn-success btn-lg ml-3" href="{% url 'manager_login' %}" role="button">
+                <i class="fas fa-user-tie"></i> Yetkili Girişi
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}İzin Taleplerini Yönet{% endblock %}
+
+{% block extra_css %}
+    <!-- DataTables Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <!-- Font Awesome (icons için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .action-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Tüm İzin Talepleri</h4>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Kapat">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <table id="leave_table" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı</th>
+                        <th>Başlangıç Tarihi</th>
+                        <th>Bitiş Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTables tarafından doldurulacak -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <!-- DataTables Turkish Language Pack -->
+    <script src="https://cdn.datatables.net/plug-ins/1.11.5/i18n/Turkish.json"></script>
+    <!-- SweetAlert2 (isteğe bağlı) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        $(document).ready(function() {
+            var table = $('#leave_table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "/leave/api/leave-request-data/",
+                    "type": "GET",
+                    "dataSrc": function(json) {
+                        return json.data;
+                    },
+                    "error": function(xhr, error, thrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata',
+                            text: 'Veri alınırken bir hata oluştu.'
+                        });
+                    }
+                },
+                "columns": [
+                    {"data": "username", "title": "Kullanıcı"},
+                    {"data": "start_date", "title": "Başlangıç Tarihi"},
+                    {"data": "end_date", "title": "Bitiş Tarihi"},
+                    {"data": "status", "title": "Durum"},
+                    {
+                        "data": null,
+                        "title": "İşlemler",
+                        "orderable": false,
+                        "searchable": false,
+                        "render": function(data, type, row) {
+                            if (row.status === 'pending') {
+                                return `
+                                    <div class="action-buttons">
+                                        <button class="btn btn-success btn-sm" onclick="updateStatus(${row.id}, 'approve')">
+                                            <i class="fas fa-check"></i> Onayla
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="updateStatus(${row.id}, 'reject')">
+                                            <i class="fas fa-times"></i> Reddet
+                                        </button>
+                                    </div>
+                                `;
+                            } else {
+                                return `
+                                    <span class="badge badge-${row.status === 'approved' ? 'success' : 'danger'}">
+                                        ${row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+                                    </span>
+                                `;
+                            }
+                        }
+                    }
+                ],
+                "order": [[1, "asc"]],
+                "pageLength": 10,
+                "responsive": true
+            });
+        });
+
+        function updateStatus(id, action) {
+            var actionText = action === 'approve' ? 'Onaylamak' : 'Reddetmek';
+            Swal.fire({
+                title: `İzin Talebini ${actionText}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: `Evet, ${actionText}`,
+                cancelButtonText: 'İptal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/leave/${action}/${id}/`,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Başarılı',
+                                    text: `İzin talebi ${action === 'approve' ? 'onaylandı' : 'reddedildi'}.`,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                $('#leave_table').DataTable().ajax.reload(null, false);
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata',
+                                    text: 'İşlem başarısız oldu.'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata',
+                                text: 'Sunucu ile iletişim kurulamadı.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // CSRF Token alma fonksiyonu
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Cookie is name=value
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+{% endblock %}

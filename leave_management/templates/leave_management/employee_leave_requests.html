@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>İzin Taleplerim</title>
+</head>
+<body>
+    <h2>İzin Taleplerim</h2>
+    <ul id="leave-list"></ul>
+    <script>
+        fetch('/leave/api/my-leave-requests/')
+    .then(response => response.json())
+    .then(data => {
+        const list = document.getElementById('leave-list');
+        list.innerHTML = '';  // Önceki içeriği temizle
+        data.data.forEach(request => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>Başlangıç:</strong> ${request.start_date} <br>
+                <strong>Bitiş:</strong> ${request.end_date} <br>
+                <strong>Durum:</strong> ${request.status} <br>
+                <strong>Neden:</strong> ${request.reason}
+            `;
+            list.appendChild(li);
+        });
+    })
+    .catch(error => console.error('API Hatası:', error));
+     
+    </script>
+</body>
+</html>

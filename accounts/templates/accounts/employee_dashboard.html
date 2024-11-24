@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Personel Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Hoş Geldiniz Mesajı -->
+        <div class="col-12 text-center mb-4">
+            <h1 class="display-4">Hoş geldiniz, {{ request.user.username }}</h1>
+            <p class="lead">Bu sizin personel paneliniz.</p>
+            <h4>Kalan İzin Günleriniz:</h4>
+            <p class="display-4 text-success">{{ remaining_leave_days }}</p>
+            <hr class="my-4">
+        </div>
+    </div>
+    <div class="row">
+        <!-- İzin Talep Et Kartı -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-paper-plane fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">İzin Talep Et</h5>
+                    <p class="card-text">Yeni bir izin talebinde bulunmak için buraya tıklayın.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'leave_request_create' %}" class="btn btn-primary btn-block">İzin Talep Et</a>
+                </div>
+            </div>
+        </div>
+        <!-- İzin Taleplerim Kartı -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-list fa-3x mb-3 text-info"></i>
+                    <h5 class="card-title">İzin Taleplerim</h5>
+                    <p class="card-text">Mevcut izin taleplerinizi görüntülemek için buraya tıklayın.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'leave_request_list' %}" class="btn btn-info btn-block">İzin Taleplerim</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
