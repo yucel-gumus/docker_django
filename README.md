@@ -153,7 +153,7 @@ Birim testlerini çalıştırmak için:
 ```bash
 docker-compose exec web python manage.py test
 ```
-
+Projeyi çalıştırdıktan sonra /swagger/ URL'sine giderek Swagger dokümantasyonunu görüntüleyebilirsiniz.
 ---
 ## 📜 Lisans
 
