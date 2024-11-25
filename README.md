@@ -22,7 +22,6 @@ izin_takip/
 ├── accounts/              # Kullanıcı işlemleri (giriş, kayıt, profil)
 ├── leave_management/      # İzin yönetimi
 ├── izin_takip/            # Proje ayarları ve asıl dosyalar
-├── static/                # Statik dosyalar
 ├── templates/             # HTML şablonları
 ├── Dockerfile             # Docker imajını oluşturmak için
 ├── docker-compose.yml     # Çoklu servis yönetimi için
@@ -136,29 +135,6 @@ docker-compose exec web python manage.py test
 ```
 
 ---
-
-## 🖥️ Canlı Yayınlama
-
-1. **`DEBUG`'i kapatın:**
-
-   `settings.py` içinde:
-   ```python
-   DEBUG = False
-   ```
-
-2. **Statik dosyaları toplayın:**
-
-   ```bash
-   docker-compose exec web python manage.py collectstatic
-   ```
-
-3. **Canlı sunucuda çalıştırın:**
-
-   - Nginx ile ters proxy kurulumunu tamamlayın.
-   - HTTPS için Let’s Encrypt kullanın.
-
----
-
 ## 📜 Lisans
 
 Bu proje MIT Lisansı ile lisanslanmıştır. Daha fazla bilgi için [LICENSE](LICENSE) dosyasını inceleyin.
