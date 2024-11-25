@@ -1,4 +1,3 @@
-# your_app/templatetags/form_tags.py
 
 from django import template
 

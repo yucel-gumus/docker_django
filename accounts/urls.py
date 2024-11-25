@@ -12,5 +12,6 @@ urlpatterns = [
     path('api/employee_data/', EmployeeDataView.as_view(), name='employee_data'),
     path('manager/employee-list/', views.employee_list, name='employee_list'),
     path('notifications/read/<int:pk>/', views.mark_notification_as_read, name='mark_notification_as_read'),
+    path('submit-attendance/', views.submit_attendance, name='submit_attendance'),
 
 ]

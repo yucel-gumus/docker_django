@@ -9,7 +9,10 @@ from accounts.tasks import create_notification_for_manager
 from accounts.models import Notification
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-
+from .forms import AttendanceForm
+from leave_management.models import Attendance
+from accounts.tasks import notify_manager_for_lateness
+from datetime import datetime, time
 
 def employee_login(request):
     if request.method == "POST":
@@ -87,3 +90,39 @@ def mark_notification_as_read(request, pk):
     return JsonResponse(
         {"status": "fail", "message": "Invalid request method"}, status=400
     )
+
+
+@login_required
+def submit_attendance(request):
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            user = request.user 
+            entry_time = form.cleaned_data['entry_time']
+            exit_time = time(18, 0)  
+
+            attendance, created = Attendance.objects.get_or_create(
+                user=user,
+                date=datetime.now().date(),
+                defaults={'entry_time': entry_time, 'exit_time': exit_time}
+            )
+
+            if not created:
+                attendance.entry_time = entry_time
+                attendance.exit_time = exit_time
+                attendance.save()
+
+            attendance.calculate_late_minutes() 
+            attendance.save()
+
+            if attendance.late_minutes > 0:
+                notify_manager_for_lateness.delay(
+                    user_id=user.id,
+                    late_minutes=attendance.late_minutes
+                )
+
+            return redirect('employee_dashboard')  
+    else:
+        form = AttendanceForm()
+
+    return render(request, 'accounts/submit_attendance.html', {'form': form})

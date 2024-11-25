@@ -50,7 +50,7 @@ def leave_request_list(request):
 @require_POST
 def leave_request_approve(request, pk):
     try:
-        with transaction.atomic():  # Veritabanı işlemlerini atomik hale getirir
+        with transaction.atomic():  
             leave_request = get_object_or_404(LeaveRequest, pk=pk)
             if leave_request.status != "pending":
                 return JsonResponse(
@@ -58,11 +58,10 @@ def leave_request_approve(request, pk):
                     status=400,
                 )
 
-            # İzin süresini hesapla
             start_date = leave_request.start_date
             end_date = leave_request.end_date
             delta = end_date - start_date
-            leave_days = delta.days + 1  # Başlangıç ve bitiş günlerini dahil et
+            leave_days = delta.days + 1 
 
             if leave_days <= 0:
                 return JsonResponse(
@@ -81,7 +80,6 @@ def leave_request_approve(request, pk):
                     status=400,
                 )
 
-            # İzin günlerini düş
             user_profile.annual_leave_days -= leave_days
             user_profile.save()
 
@@ -93,7 +91,6 @@ def leave_request_approve(request, pk):
                         message=f"{leave_request.user.username} adlı personelin yıllık izni {user_profile.annual_leave_days} güne düştü.",
                     )
 
-            # İzin talebini onayla
             leave_request.status = "approved"
             leave_request.save()
 
@@ -111,7 +108,7 @@ def leave_request_approve(request, pk):
 @require_POST
 def leave_request_reject(request, pk):
     try:
-        with transaction.atomic():  # Veritabanı işlemlerini atomik hale getirir
+        with transaction.atomic(): 
             leave_request = get_object_or_404(LeaveRequest, pk=pk)
             if leave_request.status != "pending":
                 return JsonResponse(
@@ -150,30 +147,23 @@ def leave_create_for_employee(request):
         start_date_str = request.POST.get('start_date')
         end_date_str = request.POST.get('end_date')
         
-        # Veriler eksikse, hata mesajı göster
         if not start_date_str or not end_date_str:
             messages.error(request, "Başlangıç ve Bitiş tarihleri boş olamaz.")
-            return redirect('leave_create_for_employee')  # Aynı sayfaya geri yönlendir
+            return redirect('leave_create_for_employee') 
 
-        # Tarihleri dönüştürme
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
 
-        # İzin süresi hesapla
         total_days = (end_date - start_date).days + 1
 
-        # Personel seçme
         user = User.objects.get(username=username)
 
-        # Yıllık izin gününü düşür
         profile = user.profile
         new_annual_leave_days = profile.annual_leave_days - total_days
 
-        # Eğer yıllık izin günleri negatif oluyorsa, 0 yap
         if new_annual_leave_days < 0:
             new_annual_leave_days = 0
 
-        # İzin oluştur
         leave_request = LeaveRequest.objects.create(
             user=user,
             start_date=start_date,
@@ -182,11 +172,9 @@ def leave_create_for_employee(request):
             status="approved"
         )
 
-        # Yıllık izin gününü güncelle
         profile.annual_leave_days = new_annual_leave_days
         profile.save()
 
-        # Eğer izin süresi 3 günden azsa bildirim gönder
         if profile.annual_leave_days < 3:
                 managers = User.objects.filter(profile__role="manager")
                 for manager in managers:
@@ -195,11 +183,9 @@ def leave_create_for_employee(request):
                         message=f"{leave_request.user.username} adlı personelin yıllık izni {profile.annual_leave_days} güne düştü.",
                     )
 
-        # Başarı mesajı ve yönlendirme
         messages.success(request, f"{user.username} için {total_days} gün izin tanımlandı.")
         
-        # Yönlendirme yapılacak doğru URL'yi belirtin
-        return redirect('manager_leave_request_list')  # Örnek: Burada 'employee_dashboard' URL'yi kullanabilirsiniz.
+        return redirect('manager_leave_request_list')  
 
     return render(request, 'leave_management/leave_create_for_employee.html', {'users': User.objects.all()})
 
@@ -211,14 +197,12 @@ def record_entry(request):
         today = datetime.now().date()
         now = datetime.now().time()
 
-        # Günlük giriş kaydı
         attendance, created = Attendance.objects.get_or_create(user=request.user, date=today)
         if created:
             attendance.entry_time = now
             attendance.calculate_late_minutes()
             attendance.save()
 
-            # Geç kalma bildirimi oluştur
             if attendance.late_minutes > 0:
                 notify_manager_for_lateness.delay(
                     user_id=request.user.id,
@@ -241,7 +225,6 @@ def record_exit(request):
         today = datetime.now().date()
         now = datetime.now().time()
 
-        # Günlük çıkış kaydı
         attendance = Attendance.objects.filter(user=request.user, date=today).first()
         if attendance:
             attendance.exit_time = now
@@ -257,11 +240,9 @@ def record_exit(request):
 @login_required
 @manager_required
 def monthly_work_summary(request):
-    # Geçerli ay ve yılı alın
     current_month = datetime.now().month
     current_year = datetime.now().year
 
-    # Kullanıcı bazında çalışma saatlerini topla
     attendance_data = Attendance.objects.filter(
         date__year=current_year,
         date__month=current_month

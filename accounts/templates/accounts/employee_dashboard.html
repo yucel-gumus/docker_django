@@ -5,17 +5,16 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row">
-        <!-- Hoş Geldiniz Mesajı -->
         <div class="col-12 text-center mb-4">
             <h1 class="display-4">Hoş geldiniz, {{ request.user.username }}</h1>
             <p class="lead">Bu sizin personel paneliniz.</p>
             <h4>Kalan İzin Günleriniz:</h4>
             <p class="display-4 text-success">{{ remaining_leave_days }}</p>
             <hr class="my-4">
+            <a href="{% url 'submit_attendance' %}" class="btn btn-primary">Bildirim Gönder</a>
         </div>
     </div>
     <div class="row">
-        <!-- İzin Talep Et Kartı -->
         <div class="col-md-6 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
@@ -28,7 +27,6 @@
                 </div>
             </div>
         </div>
-        <!-- İzin Taleplerim Kartı -->
         <div class="col-md-6 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">

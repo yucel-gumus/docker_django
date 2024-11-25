@@ -15,7 +15,6 @@
     <form method="post" novalidate>
         {% csrf_token %}
         
-        <!-- Personel Seçimi -->
         <div class="form-group">
             <label for="username">Personel Seçin:</label>
             <select name="username" class="form-control" id="username" required>
@@ -25,25 +24,21 @@
             </select>
         </div>
 
-        <!-- Başlangıç Tarihi -->
         <div class="form-group">
             <label for="start_date">Başlangıç Tarihi:</label>
             <input type="date" name="start_date" class="form-control" required>
         </div>
 
-        <!-- Bitiş Tarihi -->
         <div class="form-group">
             <label for="end_date">Bitiş Tarihi:</label>
             <input type="date" name="end_date" class="form-control" required>
         </div>
 
-        <!-- İzin Nedeni -->
         <div class="form-group">
             <label for="reason">İzin Nedeni:</label>
             <textarea name="reason" class="form-control" rows="3" required></textarea>
         </div>
 
-        <!-- Formu Gönder -->
         <button type="submit" class="btn btn-primary">İzin Ekle</button>
     </form>
 </div>

@@ -5,7 +5,6 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row">
-        <!-- Hoş Geldiniz Mesajı -->
         <div class="col-12 text-center mb-4">
             <h1 class="display-4">Hoş geldiniz, {{ request.user.username }}</h1>
             <p class="lead">Bu sizin yetkili paneliniz.</p>
@@ -17,7 +16,6 @@
             <h4>Bildirimler</h4>
         </div>
         <div id="notifications-container">
-            <!-- Gelen bildirimler burada listelenecek -->
         </div>
         <div class="card-body">
             {% if notifications %}
@@ -37,7 +35,6 @@
         </div>
     </div>
     <div class="row">
-        <!-- Personel Listesi Kartı -->
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
@@ -50,7 +47,6 @@
                 </div>
             </div>
         </div>
-        <!-- İzin Taleplerini Yönet Kartı -->
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
@@ -64,7 +60,6 @@
                 </div>
             </div>
         </div>
-        <!-- İzin Tanımla Kartı -->
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
@@ -81,7 +76,7 @@
 </div>
 <script>
     function markAsRead(notificationId) {
-        console.log(notificationId)
+
         fetch(`/accounts/notifications/read/${notificationId}/`, {
             method: 'POST',
             headers: {
@@ -90,7 +85,7 @@
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data); // Yanıtı konsola yazdır
+
                 if (data.status === 'success') {
                     location.reload();
                 }
@@ -98,7 +93,7 @@
     }
 </script>
 <script>
-    // WebSocket bağlantısını başlat
+
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     const socket = new WebSocket(protocol + window.location.host + '/ws/attendance/');
 
@@ -110,7 +105,6 @@
         const data = JSON.parse(event.data);
         const message = data.message;
 
-        // Yeni bildirimleri ekrana ekle
         const notificationContainer = document.getElementById("notifications-container");
         const newNotification = document.createElement("div");
         newNotification.classList.add("alert", "alert-info", "mt-2");

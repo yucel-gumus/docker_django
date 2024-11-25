@@ -18,7 +18,6 @@ class Profile(models.Model):
         return self.user.username
 
 
-# Kullanıcı oluşturulduğunda otomatik olarak Profil oluşturma
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -29,7 +28,7 @@ class Notification(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="account_notifications",  # Benzersiz related_name
+        related_name="account_notifications",  
     )
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

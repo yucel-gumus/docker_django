@@ -86,7 +86,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'admin',
         'PASSWORD': 'admin1234',
-        'HOST': 'db',
+        'HOST': 'db', #docker da bunu db yap
         'PORT': '5432',
     }
 }
@@ -95,13 +95,15 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis', 6379)],  # Redis ayarları
+            "hosts": [('redis', 6379)],  #dockerda redise çevir
         },
     },
 }
 
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0' 
+#CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
@@ -139,12 +141,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'  # Ensure this starts and ends with a '/'
+STATIC_URL = '/static/' 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

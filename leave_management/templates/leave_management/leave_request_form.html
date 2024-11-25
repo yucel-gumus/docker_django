@@ -3,7 +3,6 @@
 {% block title %}İzin Talep Formu{% endblock %}
 
 {% block extra_css %}
-<!-- Bootstrap Datepicker CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 {% endblock %}
 
@@ -52,20 +51,17 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Bootstrap Datepicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script>
     $(document).ready(function(){
-        // Tarih alanlarına datepicker ekleme
         $('#id_start_date, #id_end_date').attr('type', 'text')
-            .attr('placeholder', 'YYYY-MM-DD')  // Placeholder ekledik
+            .attr('placeholder', 'YYYY-MM-DD')
             .datepicker({
                 format: 'yyyy-mm-dd',
                 autoclose: true,
                 todayHighlight: true
             });
 
-        // Form kontrolü sırasında invalid sınıfını ekleme
         $('form').on('submit', function(event) {
             var isValid = true;
             $(this).find('input, select, textarea').each(function(){

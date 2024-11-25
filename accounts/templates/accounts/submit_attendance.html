@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Giriş Saatini Bildir</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+      {{ form.entry_time.label_tag }}
+      {{ form.entry_time }}
+      {{ form.entry_time.errors }}
+    </div>
+    <button type="submit">Gönder</button>
+  </form>
+{% endblock %}

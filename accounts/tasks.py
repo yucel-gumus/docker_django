@@ -24,22 +24,22 @@ def notify_manager_for_lateness(user_id, late_minutes):
         user = User.objects.get(id=user_id)
         managers = User.objects.filter(
             profile__role="manager"
-        )  # Manager rolündeki kullanıcıları al
+        )  
         for manager in managers:
             Notification.objects.create(
                 user=manager,
                 message=f"{user.username} bugün {late_minutes} dakika geç kaldı.",
-                created_at=datetime.now(),  # Correct usage of datetime.now()
+                created_at=datetime.now(), 
             )
 
         message = f"{user.username} bugün {late_minutes} dakika geç kaldı."
 
-        # WebSocket kanalına mesaj gönder
+        
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
-            "admin",  # Make sure the group name matches the one in your consumer
+            "admin",  
             {
-                "type": "attendance_notification",  # This should match the method name in your consumer
+                "type": "attendance_notification",  
                 "message": message,
             },
         )

@@ -15,16 +15,12 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # Django admin paneli için URL
     path('admin/', admin.site.urls),
 
     path('', views.index, name='index'),
-    # Accounts uygulamasının URL'leri
     path('accounts/', include('accounts.urls')),
 
-    # Leave Management uygulamasının URL'leri
     path('leave/', include('leave_management.urls')),
 
-    # Swagger dokümantasyonu için URL
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

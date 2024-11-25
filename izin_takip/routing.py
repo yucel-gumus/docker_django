@@ -1,4 +1,3 @@
-# your_project_name/routing.py
 from django.urls import re_path
 from .consumers import AttendanceConsumer
 

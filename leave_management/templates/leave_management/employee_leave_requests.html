@@ -11,7 +11,7 @@
     .then(response => response.json())
     .then(data => {
         const list = document.getElementById('leave-list');
-        list.innerHTML = '';  // Önceki içeriği temizle
+        list.innerHTML = ''; 
         data.data.forEach(request => {
             const li = document.createElement('li');
             li.innerHTML = `
