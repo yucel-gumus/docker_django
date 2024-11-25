@@ -9,9 +9,25 @@
 
 - Personel izin taleplerini oluşturma ve yönetme.
 - Yönetici paneli ile izin taleplerini onaylama/redetme.
-- WebSocket ile gerçek zamanlı bildirimler.
-- Redis tabanlı Celery ile arka plan işlemleri.
+- **WebSocket** ile gerçek zamanlı bildirimler (Geç kalma bildirimleri için kullanılır).
+- **Redis tabanlı Celery** ile arka plan işlemleri (Yıllık izin güncelleme bildirimi için kullanılır).
 - PostgreSQL veritabanı entegrasyonu.
+
+---
+
+## 👀 Ekran Görüntüleri
+
+### Personel Paneli
+![Personel Paneli](admin.png)
+
+Personel panelinde kullanıcı kalan izin günlerini görebilir ve "Bildirim Gönder" butonunu kullanarak giriş saatini belirtebilir.
+
+### Yetkili Paneli
+![Yetkili Paneli](./çalışan.png)
+
+Yetkili panelinde:
+- Mavi alan içindeki geç kalma bildirimleri **WebSocket** ile gerçek zamanlı olarak gelir.
+- Diğer izin güncelleme bildirimleri ise **Celery** arka plan görevleri ile iletilir.
 
 ---
 
@@ -72,6 +88,10 @@ izin_takip/
    ```bash
    docker-compose exec web python manage.py createsuperuser
    ```
+
+6. **Yetkili Paneli Kullanıcı Giriş Bilgileri**:
+   - Kullanıcı adı: **twontechadmin**
+   - Şifre: **admin1234**
 
 ---
 
